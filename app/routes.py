@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from urllib.parse import urlsplit
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 import sqlalchemy as sa
 from app import app, db
@@ -202,3 +202,49 @@ def unfollow(username):
         return redirect(url_for('user', username=username))
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/like_post/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    post = db.session.get(Post, post_id)
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    if current_user.has_liked_post(post):
+        current_user.unlike_post(post)
+        db.session.commit()
+        liked = False
+    else:
+        current_user.like_post(post)
+        db.session.commit()
+        liked = True
+
+    return jsonify({
+        'liked': liked,
+        'like_count': post.like_count(),
+        'dislike_count': post.dislike_count()
+    })
+
+
+@app.route('/dislike_post/<int:post_id>', methods=['POST'])
+@login_required
+def dislike_post(post_id):
+    post = db.session.get(Post, post_id)
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    if current_user.has_disliked_post(post):
+        current_user.unlike_post(post)
+        db.session.commit()
+        disliked = False
+    else:
+        current_user.dislike_post(post)
+        db.session.commit()
+        disliked = True
+
+    return jsonify({
+        'disliked': disliked,
+        'like_count': post.like_count(),
+        'dislike_count': post.dislike_count()
+    })

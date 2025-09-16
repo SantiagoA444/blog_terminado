@@ -20,6 +20,17 @@ followers = sa.Table(
 )
 
 
+likes = sa.Table(
+    'likes',
+    db.metadata,
+    sa.Column('user_id', sa.Integer, sa.ForeignKey('user.id'),
+              primary_key=True),
+    sa.Column('post_id', sa.Integer, sa.ForeignKey('post.id'),
+              primary_key=True),
+    sa.Column('is_like', sa.Boolean, nullable=False, default=True)
+)
+
+
 class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True,
@@ -41,6 +52,8 @@ class User(UserMixin, db.Model):
         secondary=followers, primaryjoin=(followers.c.followed_id == id),
         secondaryjoin=(followers.c.follower_id == id),
         back_populates='following')
+    liked_posts: so.WriteOnlyMapped['Post'] = so.relationship(
+        secondary=likes, back_populates='likers')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -106,6 +119,59 @@ class User(UserMixin, db.Model):
             return
         return db.session.get(User, id)
 
+    def like_post(self, post):
+        if not self.has_liked_post(post):
+            like_entry = sa.select(likes).where(
+                (likes.c.user_id == self.id) & (likes.c.post_id == post.id))
+            existing = db.session.scalar(like_entry)
+            if existing:
+                db.session.execute(
+                    sa.update(likes).where(
+                        (likes.c.user_id == self.id) & (likes.c.post_id == post.id)
+                    ).values(is_like=True)
+                )
+            else:
+                db.session.execute(
+                    likes.insert().values(user_id=self.id, post_id=post.id, is_like=True)
+                )
+
+    def dislike_post(self, post):
+        if not self.has_disliked_post(post):
+            like_entry = sa.select(likes).where(
+                (likes.c.user_id == self.id) & (likes.c.post_id == post.id))
+            existing = db.session.scalar(like_entry)
+            if existing:
+                db.session.execute(
+                    sa.update(likes).where(
+                        (likes.c.user_id == self.id) & (likes.c.post_id == post.id)
+                    ).values(is_like=False)
+                )
+            else:
+                db.session.execute(
+                    likes.insert().values(user_id=self.id, post_id=post.id, is_like=False)
+                )
+
+    def unlike_post(self, post):
+        db.session.execute(
+            sa.delete(likes).where(
+                (likes.c.user_id == self.id) & (likes.c.post_id == post.id)
+            )
+        )
+
+    def has_liked_post(self, post):
+        like_entry = sa.select(likes).where(
+            (likes.c.user_id == self.id) &
+            (likes.c.post_id == post.id) &
+            (likes.c.is_like == True))
+        return db.session.scalar(like_entry) is not None
+
+    def has_disliked_post(self, post):
+        like_entry = sa.select(likes).where(
+            (likes.c.user_id == self.id) &
+            (likes.c.post_id == post.id) &
+            (likes.c.is_like == False))
+        return db.session.scalar(like_entry) is not None
+
 
 @login.user_loader
 def load_user(id):
@@ -121,6 +187,20 @@ class Post(db.Model):
                                                index=True)
 
     author: so.Mapped[User] = so.relationship(back_populates='posts')
+    likers: so.WriteOnlyMapped[User] = so.relationship(
+        secondary=likes, back_populates='liked_posts')
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+    def like_count(self):
+        query = sa.select(sa.func.count()).select_from(
+            sa.select(likes.c.user_id).where(
+                (likes.c.post_id == self.id) & (likes.c.is_like == True)).subquery())
+        return db.session.scalar(query)
+
+    def dislike_count(self):
+        query = sa.select(sa.func.count()).select_from(
+            sa.select(likes.c.user_id).where(
+                (likes.c.post_id == self.id) & (likes.c.is_like == False)).subquery())
+        return db.session.scalar(query)

@@ -12,6 +12,19 @@
                 says:
                 <br>
                 {{ post.body }}
+                <br><br>
+                <div class="like-dislike-buttons">
+                    <button class="btn btn-sm btn-outline-success like-btn {{ 'active' if current_user.has_liked_post(post) }}"
+                            data-post-id="{{ post.id }}" type="button">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span class="like-count">{{ post.like_count() }}</span>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger dislike-btn {{ 'active' if current_user.has_disliked_post(post) }}"
+                            data-post-id="{{ post.id }}" type="button">
+                        <i class="fas fa-thumbs-down"></i>
+                        <span class="dislike-count">{{ post.dislike_count() }}</span>
+                    </button>
+                </div>
             </td>
         </tr>
     </table>
