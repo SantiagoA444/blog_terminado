@@ -8,6 +8,7 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, \
     EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.models import User, Post
 from app.email import send_password_reset_email
+from app.image_utils import save_post_image, get_image_url
 
 
 @app.before_request
@@ -23,10 +24,19 @@ def before_request():
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
+        # Procesar imagen si existe
+        image_filename = None
+        if form.image.data:
+            image_filename = save_post_image(form.image.data)
+
+        post = Post(
+            body=form.post.data,
+            image_filename=image_filename,
+            author=current_user
+        )
         db.session.add(post)
         db.session.commit()
-        flash('Your post is now live!')
+        flash('¡Tu post ha sido publicado!')
         return redirect(url_for('index'))
     page = request.args.get('page', 1, type=int)
     posts = db.paginate(current_user.following_posts(), page=page,

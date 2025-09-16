@@ -9,60 +9,19 @@
     {% else %}
     <title>Bienvenido a inemBook</title>
     {% endif %}
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f9;
-        }
 
-        .navbar {
-            background-color: #002147 !important;
-        }
-
-        .navbar-brand,
-        .nav-link {
-            color: #ffffff !important;
-        }
-
-        .nav-link:hover {
-            color: #ffcc00 !important;
-        }
-
-        footer {
-            background-color: #002147;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .alert {
-            border-left: 5px solid #002147;
-        }
-
-        .navbar-brand i {
-            margin-right: 5px;
-        }
-
-        .like-dislike-buttons {
-            margin-top: 10px;
-        }
-
-        .like-btn.active {
-            background-color: #198754;
-            border-color: #198754;
-            color: white;
-        }
-
-        .dislike-btn.active {
-            background-color: #dc3545;
-            border-color: #dc3545;
-            color: white;
-        }
-    </style>
+    <!-- Modern Theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-theme.css') }}">
 </head>
 
 <body>
@@ -131,89 +90,13 @@
         </div>
     </footer>
 
+    <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle like button clicks
-            document.querySelectorAll('.like-btn').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var postId = this.getAttribute('data-post-id');
-                    var likeBtn = this;
-                    var dislikeBtn = this.parentElement.querySelector('.dislike-btn');
-
-                    fetch('/like_post/' + postId, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert(data.error);
-                            return;
-                        }
-
-                        // Update like button
-                        likeBtn.querySelector('.like-count').textContent = data.like_count;
-                        if (data.liked) {
-                            likeBtn.classList.add('active');
-                            dislikeBtn.classList.remove('active');
-                        } else {
-                            likeBtn.classList.remove('active');
-                        }
-
-                        // Update dislike count
-                        dislikeBtn.querySelector('.dislike-count').textContent = data.dislike_count;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                });
-            });
-
-            // Handle dislike button clicks
-            document.querySelectorAll('.dislike-btn').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    var postId = this.getAttribute('data-post-id');
-                    var dislikeBtn = this;
-                    var likeBtn = this.parentElement.querySelector('.like-btn');
-
-                    fetch('/dislike_post/' + postId, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            alert(data.error);
-                            return;
-                        }
-
-                        // Update dislike button
-                        dislikeBtn.querySelector('.dislike-count').textContent = data.dislike_count;
-                        if (data.disliked) {
-                            dislikeBtn.classList.add('active');
-                            likeBtn.classList.remove('active');
-                        } else {
-                            dislikeBtn.classList.remove('active');
-                        }
-
-                        // Update like count
-                        likeBtn.querySelector('.like-count').textContent = data.like_count;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-                });
-            });
-        });
-    </script>
+    <!-- Modern Theme JavaScript -->
+    <script src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
 </body>
 
 </html>

@@ -1,38 +1,82 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    {% if form %}
-    <form method="POST">
-        {{ form.hidden_tag() }}
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="welcome-header mb-4">
+                <h2 class="text-center">
+                    <i class="fas fa-home me-2"></i>
+                    ¡Hola, {{ current_user.username }}!
+                </h2>
+            </div>
 
-        <div class="mb-3">
-            {{ form.post.label(class="form-label") }}
-            {{ form.post(class="form-control", placeholder="Escribe algo...") }}
+            {% if form %}
+            <div class="post-card mb-4">
+                <div class="post-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-pen me-2"></i>
+                        Crear nuevo post
+                    </h5>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="post-body">
+                        <div class="mb-3">
+                            {{ form.post(class="form-control",
+                                placeholder="¿Qué estás pensando?",
+                                rows="3",
+                                maxlength="140") }}
+                            <div class="form-text">
+                                <span id="charCount">0</span>/140 caracteres
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-image me-2"></i>
+                                {{ form.image.label.text }}
+                            </label>
+                            <div class="image-upload-container">
+                                {{ form.image(class="form-control", id="imageInput", accept="image/*") }}
+                                <div class="image-preview mt-2" id="imagePreview" style="display: none;">
+                                    <img id="previewImg" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="removeImage()">
+                                        <i class="fas fa-trash"></i> Quitar imagen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="post-actions text-end">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+            {% for post in posts %}
+                {% include '_post.html' %}
+            {% endfor %}
+
+            {% if prev_url or next_url %}
+            <nav aria-label="Post navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item{% if not prev_url %} disabled{% endif %}">
+                        <a class="page-link" href="{{ prev_url or '#' }}">
+                            <i class="fas fa-chevron-left me-1"></i> Más nuevos
+                        </a>
+                    </li>
+                    <li class="page-item{% if not next_url %} disabled{% endif %}">
+                        <a class="page-link" href="{{ next_url or '#' }}">
+                            Más antiguos <i class="fas fa-chevron-right ms-1"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
         </div>
-
-        <div class="mb-3">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
-    {% endif %}
-
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
-
-    <nav aria-label="Post navigation">
-        <ul class="pagination">
-            <li class="page-item{% if not prev_url %} disabled{% endif %}">
-                <a class="page-link" href="{{ prev_url }}">
-                    <span aria-hidden="true">&larr;</span> Newer posts
-                </a>
-            </li>
-            <li class="page-item{% if not next_url %} disabled{% endif %}">
-                <a class="page-link" href="{{ next_url }}">
-                    Older posts <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+    </div>
 {% endblock %}

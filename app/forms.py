@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, \
     TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, \
@@ -70,6 +71,9 @@ class EmptyForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    post = TextAreaField('Say something', validators=[
+    post = TextAreaField('¿Qué estás pensando?', validators=[
         DataRequired(), Length(min=1, max=140)])
-    submit = SubmitField('Submit')
+    image = FileField('Agregar imagen', validators=[
+        FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Solo se permiten imágenes (JPG, PNG, GIF)')
+    ])
+    submit = SubmitField('Publicar')
