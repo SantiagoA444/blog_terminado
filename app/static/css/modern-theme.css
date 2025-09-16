@@ -19,7 +19,7 @@
     --navbar-bg: #002147;
     --navbar-text: #ffffff;
     --navbar-hover: #ffcc00;
-    --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-bg: linear-gradient(135deg, #002147 0%, #003366 100%);
     --card-bg: #ffffff;
 }
 
@@ -37,7 +37,7 @@
     --navbar-bg: #000000;
     --navbar-text: #ffffff;
     --navbar-hover: #ffcc00;
-    --gradient-bg: linear-gradient(135deg, #434343 0%, #000000 100%);
+    --gradient-bg: linear-gradient(135deg, #002147 0%, #003366 100%);
     --card-bg: #2d2d2d;
 }
 
