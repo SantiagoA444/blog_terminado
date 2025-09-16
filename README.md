@@ -33,7 +33,7 @@ cmd
 pip install -r requirements.txt
 
 # Si no hay requirements.txt, instalar manualmente:
-pip install flask flask-sqlalchemy flask-migrate flask-login flask-mail flask-wtf python-dotenv email-validator PyJWT
+pip install flask flask-sqlalchemy flask-migrate flask-login flask-mail flask-wtf python-dotenv email-validator PyJWT flask-bootstrap
 
 4. Configurar Base de Datos
 cmd
@@ -115,6 +115,9 @@ flask db migrate -m "Descripción de cambios"
 # Aplicar migraciones
 flask db upgrade
 
+# Ejecutar tests
+python tests.py
+
 Para troubleshooting:
 cmd
 
@@ -155,6 +158,8 @@ flask run --port 5001
 
     ✅ Sistema de followers
 
+    ✅ Sistema de likes y dislikes para posts
+
     ✅ Perfiles de usuario
 
     ✅ Formularios con validación
@@ -163,7 +168,11 @@ flask run --port 5001
 
     ✅ Migraciones con Flask-Migrate
 
-📞 Soporte
+    ✅ Recuperación de contraseñas por email
+
+    ✅ Interfaz responsiva con Bootstrap
+
+Soporte
 
 Si tienes problemas con la instalación:
 
